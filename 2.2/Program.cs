@@ -11,24 +11,24 @@ namespace BigInteger
         Plus = 1
     }
 
-    public class BigNumber
+    public class LongNumber
     {
         private readonly List<byte> digits = new List<byte>();
 
-        public BigNumber(List<byte> bytes)
+        public LongNumber(List<byte> bytes)
         {
             digits = bytes.ToList();
             RemoveNulls();
         }
 
-        public BigNumber(Sign sign, List<byte> bytes)
+        public LongNumber(Sign sign, List<byte> bytes)
         {
             Sign = sign;
             digits = bytes;
             RemoveNulls();
         }
 
-        public BigNumber(string s)
+        public LongNumber(string s)
         {
             if (s.StartsWith("-"))
             {
@@ -44,9 +44,9 @@ namespace BigInteger
             RemoveNulls();
         }
 
-        public BigNumber(uint x) => digits.AddRange(GetBytes(x));
+        public LongNumber(uint x) => digits.AddRange(GetBytes(x));
 
-        public BigNumber(int x)
+        public LongNumber(int x)
         {
             if (x < 0)
             {
@@ -83,7 +83,7 @@ namespace BigInteger
             }
         }
 
-        public static BigNumber Exp(byte val, int exp)
+        public static LongNumber Exp(byte val, int exp)
         {
             var bigInt = Zero;
             bigInt.SetByte(exp, val);
@@ -91,8 +91,8 @@ namespace BigInteger
             return bigInt;
         }
 
-        public static BigNumber Zero => new BigNumber(0);
-        public static BigNumber One => new BigNumber(1);
+        public static LongNumber Zero => new LongNumber(0);
+        public static LongNumber One => new LongNumber(1);
 
         // Длина числа
         public int Size => digits.Count;
