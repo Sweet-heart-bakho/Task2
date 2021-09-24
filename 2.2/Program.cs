@@ -134,6 +134,7 @@ namespace BigInteger
         static void Main()
         {
 
+         pochemu ne poluchaetsya   
         }
     }
 }
