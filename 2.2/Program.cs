@@ -5,6 +5,8 @@ using System.Text;
 
 namespace BigInteger
 {
+    
+    //Задаем знак число + или -
     public enum Sign
     {
         Minus = -1,
@@ -113,60 +115,6 @@ namespace BigInteger
 
             digits[i] = b;
         }
-        
-        private static int Comparison(LongNumber a, LongNumber b, bool ignoreSign = false)
-        {
-            return CompareSign(a, b, ignoreSign);
-        }
-
-        private static int CompareSign(LongNumber a, LongNumber b, bool ignoreSign = false)
-        {
-            if (!ignoreSign)
-            {
-                if (a.Sign < b.Sign)
-                {
-                    return -1;
-                }
-                else if (a.Sign > b.Sign)
-                {
-                    return 1;
-                }
-            }
-
-            return CompareSize(a, b);
-        }
-
-        private static int CompareSize(LongNumber a, LongNumber b)
-        {
-            if (a.Size < b.Size)
-            {
-                return -1;
-            }
-            else if (a.Size > b.Size)
-            {
-                return 1;
-            }
-
-            return CompareDigits(a, b);
-        }
-
-        private static int CompareDigits(LongNumber a, LongNumber b)
-        {
-            var maxLength = Math.Max(a.Size, b.Size);
-            for (var i = maxLength; i >= 0; i--)
-            {
-                if (a.GetByte(i) < b.GetByte(i))
-                {
-                    return -1;
-                }
-                else if (a.GetByte(i) > b.GetByte(i))
-                {
-                    return 1;
-                }
-            }
-
-            return 0;
-        }
 
         // Преобразование длинного числа в строку
         public override string ToString()
@@ -181,6 +129,91 @@ namespace BigInteger
 
             return s.ToString();
         }
+        
+        //Сравнение чисел если они одинаковы
+        public int ifEqual(LongNumber a, LongNumber b)
+        {
+            if (a.Count == b. Count)
+            {
+                for (int i = 0; i < a.Count; i++)
+                    if (a[i] != b[i])
+                        return 0;
+                return 1;
+            }
+            return 0;
+        }
+        
+        //Преобразование в int и возравщение этого числа
+        public int ToIntLN(LongNumber a)
+        {
+            if (a.Count <= 10)
+            {
+                int of = 10 - a.Count;
+                int num = 0; 
+                int arr[] = {2, 1, 4 ,7 ,4 ,8 ,3 ,6 ,4 ,8};
+                for (int i = 0; i < a.Count; i++)
+                {
+                    if (a[i] > arr[i + of])
+                       return 0;
+                    num += a[i] * (a.Count - i);
+                }
+                return num;
+            }
+            return 0;
+        }
+        
+        //Преобразование в long и возравщение этого числа
+        public long ToLongLN(LongNumber a)
+        {
+            if (a.Count <= 19)
+            {
+                int of = 19 - a.Count;
+                int num = 0; 
+                int arr[] = {9, 2 ,2 ,3, 3 ,7 ,2, 0, 3, 6, 8, 5, 4, 7, 7, 5, 8, 0, 7};
+                for (int i = 0; i < a.Count; i++)
+                {
+                    if (a[i] > arr[i + of])
+                       return 0;
+                    num += a[i] * (a.Count - i);
+                }
+                return num;
+            }
+            return 0;
+        }
+        
+        //Преобразование в short и возравщение этого числа
+        public short ToShortLN(LongNumber a)
+        {
+            if (a.Count <= 5)
+            {
+                int of = 5 - a.Count;
+                int num = 0; 
+                int arr[] = {3, 2, 7, 6, 7};
+                for (int i = 0; i < a.Count; i++)
+                {
+                    if (a[i] > arr[i + of])
+                       return 0;
+                    num += a[i] * (a.Count - i);
+                }
+                return num;
+            }
+            return 0;
+        }
+        
+        //Преобразование в boolean
+        public bool ToBoolLN(LongNUmber a)
+        {
+            if (a.Count > 1)
+            {
+                if (a[0] == 1)
+                    return true;
+                if (a[0] == 0)
+                    reutnr false;
+                return 0;
+            }
+            return 0;
+        }
+        
     }
 
     class Program
@@ -188,6 +221,7 @@ namespace BigInteger
         static void Main()
         {
 
+         pochemu ne poluchaetsya   
         }
     }
 }
