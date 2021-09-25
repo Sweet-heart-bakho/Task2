@@ -5,6 +5,8 @@ using System.Text;
 
 namespace BigInteger
 {
+    
+    //Задаем знак число + или -
     public enum Sign
     {
         Minus = -1,
@@ -113,138 +115,6 @@ namespace BigInteger
 
             digits[i] = b;
         }
-        
-        private static int Comparison(LongNumber a, LongNumber b, bool ignoreSign = false)
-        {
-            return CompareSign(a, b, ignoreSign);
-        }
-
-        private static int CompareSign(LongNumber a, LongNumber b, bool ignoreSign = false)
-        {
-            if (!ignoreSign)
-            {
-                if (a.Sign < b.Sign)
-                {
-                    return -1;
-                }
-                else if (a.Sign > b.Sign)
-                {
-                    return 1;
-                }
-            }
-
-            return CompareSize(a, b);
-        }
-
-        private static int CompareSize(LongNumber a, LongNumber b)
-        {
-            if (a.Size < b.Size)
-            {
-                return -1;
-            }
-            else if (a.Size > b.Size)
-            {
-                return 1;
-            }
-
-            return CompareDigits(a, b);
-        }
-
-        private static int CompareDigits(LongNumber a, LongNumber b)
-        {
-            var maxLength = Math.Max(a.Size, b.Size);
-            for (var i = maxLength; i >= 0; i--)
-            {
-                if (a.GetByte(i) < b.GetByte(i))
-                {
-                    return -1;
-                }
-                else if (a.GetByte(i) > b.GetByte(i))
-                {
-                    return 1;
-                }
-            }
-
-            return 0;
-        }
-        
-        private static LongNumber Add(LongNumber a, LongNumber b)
-{
-    var digits = new List<byte>();
-
-    var maxLength = Math.Max(a.Size, b.Size);
-    byte t = 0;
-    for (int i = 0; i < maxLength; i++)
-    {
-        byte sum = (byte)(a.GetByte(i) + b.GetByte(i) + t);
-        if (sum > 10)
-        {
-            sum -= 10;
-            t = 1;
-        }
-        else
-        {
-            t = 0;
-        }
-
-        digits.Add(sum);
-    }
-
-    if (t > 0)
-    {
-        digits.Add(t);
-    }
-
-    return new LongNumber(a.Sign, digits);
-}
-        
-        private static LongNumber Substract(LongNumber a, LongNumber b)
-{
-    var digits = new List<byte>();
-
-    LongNumber max = Zero;
-    LongNumber min = Zero;
-
-    //сравниваем числа игнорируя знак
-    var compare = Comparison(a, b, ignoreSign: true);
-
-    switch (compare)
-    {
-        case -1:
-            min = a;
-            max = b;
-            break;
-        case 0:
-            //если числа равны возвращаем 0
-            return Zero;
-        case 1:
-            min = b;
-            max = a;
-            break;
-    }
-    
-    //из большего вычитаем меньшее
-    var maxLength = Math.Max(a.Size, b.Size);
-
-    var t = 0;
-    for (var i = 0; i < maxLength; i++)
-    {
-        var s = max.GetByte(i) - min.GetByte(i) - t;
-        if (s < 0)
-        {
-            s += 10;
-            t = 1;
-        }
-        else
-        {
-            t = 0;
-        }
-
-        digits.Add((byte)s);
-    }
-
-    return new LongNumber(max.Sign, digits);
-}
 
         // Преобразование длинного числа в строку
         public override string ToString()
@@ -259,69 +129,99 @@ namespace BigInteger
 
             return s.ToString();
         }
-    }
-    
-    private static LongNumber Multiply(LongNumber a, LongNumber b)
-{            
-    var retValue = Zero;
-
-    for (var i = 0; i < a.Size; i++)
-    {
-        for (int j = 0, carry = 0; (j < b.Size) || (carry > 0); j++)
+        
+        //Сравнение чисел если они одинаковы
+        public int ifEqual(LongNumber a, LongNumber b)
         {
-            var cur = retValue.GetByte(i + j) + a.GetByte(i) * b.GetByte(j) + carry;
-            retValue.SetByte(i + j, (byte)(cur % 10));
-            carry = cur / 10;
+            if (a.Count == b. Count)
+            {
+                for (int i = 0; i < a.Count; i++)
+                    if (a[i] != b[i])
+                        return 0;
+                return 1;
+            }
+            return 0;
         }
-    }
-
-    retValue.Sign = a.Sign == b.Sign ? Sign.Plus : Sign.Minus;
-    return retValue;
-}
-    
-    private static LongNumber Div(LongNumber a, LongNumber b)
-{
-    var retValue = Zero;
-    var curValue = Zero;
-
-    for (var i = a.Size - 1; i >= 0; i--)
-    {
-        curValue += Exp(a.GetByte(i), i);
-
-        var x = 0;
-        var l = 0;
-        var r = 10;
-        while (l <= r)
+        
+        //Преобразование в int и возравщение этого числа
+        public int ToIntLN(LongNumber a)
         {
-            var m = (l + r) / 2;
-            var cur = b * Exp((byte)m,i);
-            if (cur <= curValue)
+            if (a.Count <= 10)
             {
-                x = m;
-                l = m + 1;
+                int of = 10 - a.Count;
+                int num = 0;
+                int arr[] = {2, 1, 4 ,7 ,4 ,8 ,3 ,6 ,4 ,8};
+                for (int i = 0; i < a.Count; i++)
+                {
+                    if (a[i] > arr[i + of])
+                       return 0;
+                    num += a[i] * (a.Count - i);
+                }
+                return num;
             }
-            else
-            {
-                r = m - 1;
-            }
+            return 0;
         }
-
-        retValue.SetByte(i, (byte)(x % 10));
-        var t = b * Exp((byte)x, i);
-        curValue = curValue - t;
+        
+        //Преобразование в long и возравщение этого числа
+        public long ToLongLN(LongNumber a)
+        {
+            if (a.Count <= 19)
+            {
+                int of = 19 - a.Count;
+                int num = 0; 
+                int arr[] = {9, 2 ,2 ,3, 3 ,7 ,2, 0, 3, 6, 8, 5, 4, 7, 7, 5, 8, 0, 7};
+                for (int i = 0; i < a.Count; i++)
+                {
+                    if (a[i] > arr[i + of])
+                       return 0;
+                    num += a[i] * (a.Count - i);
+                }
+                return num;
+            }
+            return 0;
+        }
+        
+        //Преобразование в short и возравщение этого числа
+        public short ToShortLN(LongNumber a)
+        {
+            if (a.Count <= 5)
+            {
+                int of = 5 - a.Count;
+                int num = 0; 
+                int arr[] = {3, 2, 7, 6, 7};
+                for (int i = 0; i < a.Count; i++)
+                {
+                    if (a[i] > arr[i + of])
+                       return 0;
+                    num += a[i] * (a.Count - i);
+                }
+                return num;
+            }
+            return 0;
+        }
+        
+        //Преобразование в boolean
+        public bool ToBoolLN(LongNUmber a)
+        {
+            if (a.Count > 1)
+            {
+                if (a[0] == 1)
+                    return true;
+                if (a[0] == 0)
+                    reutnr false;
+                return 0;
+            }
+            return 0;
+        }
+        
     }
-
-    retValue.RemoveNulls();
-
-    retValue.Sign = a.Sign == b.Sign ? Sign.Plus : Sign.Minus;
-    return retValue;
-}
 
     class Program
     {
         static void Main()
         {
 
+         pochemu ne poluchaetsya   
         }
     }
 }
