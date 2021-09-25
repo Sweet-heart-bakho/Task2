@@ -167,6 +167,84 @@ namespace BigInteger
 
             return 0;
         }
+        
+        private static LongNumber Add(LongNumber a, LongNumber b)
+{
+    var digits = new List<byte>();
+
+    var maxLength = Math.Max(a.Size, b.Size);
+    byte t = 0;
+    for (int i = 0; i < maxLength; i++)
+    {
+        byte sum = (byte)(a.GetByte(i) + b.GetByte(i) + t);
+        if (sum > 10)
+        {
+            sum -= 10;
+            t = 1;
+        }
+        else
+        {
+            t = 0;
+        }
+
+        digits.Add(sum);
+    }
+
+    if (t > 0)
+    {
+        digits.Add(t);
+    }
+
+    return new LongNumber(a.Sign, digits);
+}
+        
+        private static LongNumber Substract(LongNumber a, LongNumber b)
+{
+    var digits = new List<byte>();
+
+    LongNumber max = Zero;
+    LongNumber min = Zero;
+
+    //сравниваем числа игнорируя знак
+    var compare = Comparison(a, b, ignoreSign: true);
+
+    switch (compare)
+    {
+        case -1:
+            min = a;
+            max = b;
+            break;
+        case 0:
+            //если числа равны возвращаем 0
+            return Zero;
+        case 1:
+            min = b;
+            max = a;
+            break;
+    }
+    
+    //из большего вычитаем меньшее
+    var maxLength = Math.Max(a.Size, b.Size);
+
+    var t = 0;
+    for (var i = 0; i < maxLength; i++)
+    {
+        var s = max.GetByte(i) - min.GetByte(i) - t;
+        if (s < 0)
+        {
+            s += 10;
+            t = 1;
+        }
+        else
+        {
+            t = 0;
+        }
+
+        digits.Add((byte)s);
+    }
+
+    return new LongNumber(max.Sign, digits);
+}
 
         // Преобразование длинного числа в строку
         public override string ToString()
@@ -182,6 +260,62 @@ namespace BigInteger
             return s.ToString();
         }
     }
+    
+    private static LongNumber Multiply(LongNumber a, LongNumber b)
+{            
+    var retValue = Zero;
+
+    for (var i = 0; i < a.Size; i++)
+    {
+        for (int j = 0, carry = 0; (j < b.Size) || (carry > 0); j++)
+        {
+            var cur = retValue.GetByte(i + j) + a.GetByte(i) * b.GetByte(j) + carry;
+            retValue.SetByte(i + j, (byte)(cur % 10));
+            carry = cur / 10;
+        }
+    }
+
+    retValue.Sign = a.Sign == b.Sign ? Sign.Plus : Sign.Minus;
+    return retValue;
+}
+    
+    private static LongNumber Div(LongNumber a, LongNumber b)
+{
+    var retValue = Zero;
+    var curValue = Zero;
+
+    for (var i = a.Size - 1; i >= 0; i--)
+    {
+        curValue += Exp(a.GetByte(i), i);
+
+        var x = 0;
+        var l = 0;
+        var r = 10;
+        while (l <= r)
+        {
+            var m = (l + r) / 2;
+            var cur = b * Exp((byte)m,i);
+            if (cur <= curValue)
+            {
+                x = m;
+                l = m + 1;
+            }
+            else
+            {
+                r = m - 1;
+            }
+        }
+
+        retValue.SetByte(i, (byte)(x % 10));
+        var t = b * Exp((byte)x, i);
+        curValue = curValue - t;
+    }
+
+    retValue.RemoveNulls();
+
+    retValue.Sign = a.Sign == b.Sign ? Sign.Plus : Sign.Minus;
+    return retValue;
+}
 
     class Program
     {
